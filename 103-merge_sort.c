@@ -2,71 +2,73 @@
 #include <stdlib.h>
 #include "sort.h"
 
-void merge(int *array, int *left, int *right, size_t size);
-void merge_sort(int *array, size_t size);
-
 /**
  * merge - Merges two subarrays of array[]
- * @array: The array to be sorted
- * @left: The left subarray
- * @mid: The middle index
- * @right: The right subarray
+ * @array: Pointer to the array to be sorted
+ * @left: Pointer to the left subarray
+ * @right: Pointer to the right subarray
+ * @size_l: Size of the left subarray
+ * @size_r: Size of the right subarray
  */
-void merge(int *array, int *left, int *right, size_t size)
+void merge(int *array, int *left, int *right, size_t size_l, size_t size_r)
 {
-	size_t i = 0, j = 0, k = 0;
-	size_t left_size = size / 2;
-	size_t right_size = size - left_size;
+    size_t i = 0, j = 0, k = 0;
+    int *temp = malloc(sizeof(int) * (size_l + size_r));
 
-	while (i < left_size && j < right_size)
-	{
-		if (left[i] <= right[j])
-		{
-			array[k] = left[i];
-			i++;
-		}
-		else
-		{
-			array[k] = right[j];
-			j++;
-		}
-		k++;
-	}
+    if (temp == NULL)
+        return;
 
-	while (i < left_size)
-	{
-		array[k] = left[i];
-		i++;
-		k++;
-	}
+    printf("Merging...\n[left]: ");
+    print_array(left, size_l);
+    printf("[right]: ");
+    print_array(right, size_r);
 
-	while (j < right_size)
-	{
-		array[k] = right[j];
-		j++;
-		k++;
-	}
+    while (i < size_l && j < size_r)
+    {
+        if (left[i] <= right[j])
+            temp[k++] = left[i++];
+        else
+            temp[k++] = right[j++];
+    }
+
+    while (i < size_l)
+        temp[k++] = left[i++];
+
+    while (j < size_r)
+        temp[k++] = right[j++];
+
+    for (i = 0; i < size_l + size_r; i++)
+        array[i] = temp[i];
+
+    printf("[Done]: ");
+    print_array(array, size_l + size_r);
+
+    free(temp);
 }
 
 /**
- * merge_sort - Sorts an array of integers in ascending order using the
- *              Merge sort algorithm
- * @array: The array to be sorted
- * @size: The size of the array
+ * merge_sort - Sorts an array of integers in ascending order
+ *              using the Merge sort algorithm
+ * @array: Pointer to the array to be sorted
+ * @size: Size of the array
  */
 void merge_sort(int *array, size_t size)
 {
-	if (size < 2)
-		return;
+    size_t mid;
+    int *left, *right;
 
-	size_t mid = size / 2;
-	size_t left_size = mid;
-	size_t right_size = size - mid;
-	int *left = array;
-	int *right = array + mid;
+    if (array == NULL || size < 2)
+        return;
 
-	merge_sort(left, left_size);
-	merge_sort(right, right_size);
-	merge(array, left, right, size);
+    if (size > 1)
+    {
+        mid = size / 2;
+        left = array;
+        right = array + mid;
+
+        merge_sort(left, mid);
+        merge_sort(right, size - mid);
+
+        merge(array, left, right, mid, size - mid);
+    }
 }
-
