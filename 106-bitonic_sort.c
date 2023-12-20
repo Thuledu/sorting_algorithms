@@ -1,6 +1,23 @@
 #include <stdio.h>
 #include "sort.h"
 
+void swap(int *a, int *b);
+void bitonic_merge(int *array, size_t size, size_t start, size_t count, int dir);
+void bitonic_sort_recursive(int *array, size_t size, size_t start, size_t count, int dir);
+void bitonic_sort(int *array, size_t size);
+
+/**
+ * swap - Swaps two elements in an array
+ * @a: Pointer to the first element
+ * @b: Pointer to the second element
+ */
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 /**
  * bitonic_merge - Merges two subarrays in a specific order
  * @array: Pointer to the array to be sorted
