@@ -1,71 +1,47 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "deck.h"
-
-void swap_nodes(deck_node_t **deck, deck_node_t *node1, deck_node_t *node2);
-void sort_deck(deck_node_t **deck);
+#include <stdlib.h>
+#include <string.h>
 
 /**
- * swap_nodes - Swaps two nodes in a doubly linked list
- * @deck: Pointer to the deck of cards
- * @node1: First node to swap
- * @node2: Second node to swap
+ * compare_cards - Compare function for qsort
+ * @card1: Pointer to the first card
+ * @card2: Pointer to the second card
+ * Return: Integer value based on the comparison
  */
-void swap_nodes(deck_node_t **deck, deck_node_t *node1, deck_node_t *node2)
+int compare_cards(const void *card1, const void *card2)
 {
-	if (node1->prev)
-		node1->prev->next = node2;
-	if (node2->next)
-		node2->next->prev = node1;
+    const card_t *c1 = *(const card_t **)card1;
+    const card_t *c2 = *(const card_t **)card2;
 
-	node1->next = node2->next;
-	node2->prev = node1->prev;
-	node1->prev = node2;
-	node2->next = node1;
-
-	if (node2->prev)
-		node2->prev->next = node1;
-	if (node1->next)
-		node1->next->prev = node2;
-
-	if (*deck == node1)
-		*deck = node2;
-	else if (*deck == node2)
-		*deck = node1;
+    if (c1->kind != c2->kind)
+        return (c1->kind - c2->kind);
+    else
+        return (strcmp(c1->value, c2->value));
 }
 
 /**
- * sort_deck - Sorts a deck of cards in ascending order
- * @deck: Double pointer to the deck of cards
+ * sort_deck - Sorts a deck of cards
+ * @deck: Pointer to the head of the deck
  */
 void sort_deck(deck_node_t **deck)
 {
-	int swapped;
-	deck_node_t *ptr1 = *deck;
-	deck_node_t *lptr = NULL;
+    size_t count = 0, i;
+    deck_node_t *current = *deck;
+    card_t *cards[52];
 
-	if (*deck == NULL)
-		return;
+    while (current != NULL)
+    {
+        cards[count] = (card_t *)current->card;
+        current = current->next;
+        count++;
+    }
 
-	do {
-		swapped = 0;
-		ptr1 = *deck;
+    qsort(cards, count, sizeof(card_t *), compare_cards);
 
-		while (ptr1->next != lptr)
-		{
-			if (ptr1->card->kind > ptr1->next->card->kind ||
-					(ptr1->card->kind == ptr1->next->card->kind &&
-					 strcmp(ptr1->card->value, ptr1->next->card->value) > 0))
-			{
-				swap_nodes(deck, ptr1, ptr1->next);
-				swapped = 1;
-			}
-			else
-			{
-				ptr1 = ptr1->next;
-			}
-		}
-
-		lptr = ptr1;
-	} while (swapped);
+    current = *deck;
+    for (i = 0; i < count; i++)
+    {
+        current->card = cards[i];
+        current = current->next;
+    }
 }
