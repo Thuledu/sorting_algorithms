@@ -1,68 +1,66 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "sort.h"
 
-void sift_down(int *array, size_t start, size_t end, size_t size);
-void heap_sort(int *array, size_t size);
-
 /**
- * sift_down - Performs the sift-down operation on a heap
- * @array: The array representing the heap
- * @start: The starting index of the subtree
- * @end: The ending index of the subtree
- * @size: The size of the array
+ * swap - Swaps two elements in an array
+ * @a: Pointer to the first element
+ * @b: Pointer to the second element
  */
-void sift_down(int *array, size_t start, size_t end, size_t size)
+void swap(int *a, int *b)
 {
-	size_t root = start;
-
-	while (root * 2 + 1 <= end)
-	{
-		size_t child = root * 2 + 1;
-		size_t swap = root;
-
-		if (array[swap] < array[child])
-			swap = child;
-		if (child + 1 <= end && array[swap] < array[child + 1])
-			swap = child + 1;
-		if (swap != root)
-		{
-			int temp = array[root];
-
-			array[root] = array[swap];
-			array[swap] = temp;
-			print_array(array, size);
-			root = swap;
-		}
-		else
-		{
-
-			return;
-		}
-	}
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 /**
- * heap_sort - Sorts an array of integers in ascending order using the
- *             Heap sort algorithm
- * @array: The array to be sorted
- * @size: The size of the array
+ * heapify - Ensures the heap property is maintained
+ * @array: Pointer to the array to be sorted
+ * @size: Size of the array
+ * @i: Index of the current node
+ * @n: Size of the heap
+ */
+void heapify(int *array, size_t size, size_t i, size_t n)
+{
+    size_t largest = i;
+    size_t left = 2 * i + 1;
+    size_t right = 2 * i + 2;
+
+    if (left < n && array[left] > array[largest])
+        largest = left;
+
+    if (right < n && array[right] > array[largest])
+        largest = right;
+
+    if (largest != i)
+    {
+        swap(&array[i], &array[largest]);
+        print_array(array, size);
+        heapify(array, size, largest, n);
+    }
+}
+
+
+/**
+ * heap_sort - Sorts an array of integers in ascending order
+ *              using the Heap sort algorithm
+ * @array: Pointer to the array to be sorted
+ * @size: Size of the array
  */
 void heap_sort(int *array, size_t size)
 {
-	if (size < 2)
-		return;
+    int i;
 
-	for (size_t i = size / 2 - 1; i > 0; i--)
-		sift_down(array, i, size - 1, size);
+    if (array == NULL || size < 2)
+        return;
 
-	for (size_t i = size - 1; i > 0; i--)
-	{
-		int temp = array[0];
+    for (i = size / 2 - 1; i >= 0; i--)
+        heapify(array, size, i, size);
 
-		array[0] = array[i];
-		array[i] = temp;
-		print_array(array, size);
-		sift_down(array, 0, i - 1, size);
-	}
+    for (i = size - 1; i > 0; i--)
+    {
+        swap(&array[0], &array[i]);
+        print_array(array, size);
+        heapify(array, size, 0, i);
+    }
 }
